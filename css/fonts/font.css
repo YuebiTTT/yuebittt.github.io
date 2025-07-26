@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'awa';
+    font-display: swap;
+    src: url('AaZiTiGuanJiaFangMeng-2.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'pudding';
+    font-display: swap;
+    src: url('pudding.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'reg';
+    font-display: swap;
+    src: url('fa-regular-400.woff2') format('woff2');
+}

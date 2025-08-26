@@ -6,7 +6,7 @@
   <link href="https://yuebittt.github.io/atom.xml" rel="self"/>
   
   <link href="https://yuebittt.github.io/"/>
-  <updated>2025-08-17T09:11:44.623Z</updated>
+  <updated>2025-08-26T16:49:41.668Z</updated>
   <id>https://yuebittt.github.io/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>网络通知</title>
+    <link href="https://yuebittt.github.io/2025/08/27/%E7%BD%91%E7%BB%9C%E9%80%9A%E7%9F%A5/"/>
+    <id>https://yuebittt.github.io/2025/08/27/%E7%BD%91%E7%BB%9C%E9%80%9A%E7%9F%A5/</id>
+    <published>2025-08-26T16:31:05.000Z</published>
+    <updated>2025-08-26T16:49:41.668Z</updated>
+    
+    <content type="html"><![CDATA[<p>各位校园网在逃人员：</p><p>原计划通过接入点（AP）进行网络连接遇到了一些技术障碍，暂时无法实施。具体原因将于我们即将发布的下一篇博客中详细说明，我们诚挚邀请您持续关注。</p><p>我们近期发现校园内有一个已获取密码的WiFi网络，名称为C100。由于信号覆盖范围有限，该网络仅在部分课室可正常使用。其网络密码为pysy8888，VPN连接方式与以往相同。</p><p>此外，由于近期7班的一次操作失误，导致服务器IP地址泄露。为确保网络安全，服务器已于昨日（8月25日）晚修期间暂停服务。今日（8月26日），我们已重新启用服务器，并将IP地址变更为10.88.202.48。此更改不会对Random VPN中的服务器地址，其他相关地址保持不变。</p><p>在我们正式发布新的配置文件通知之前，所有现有的OpenVPN配置文件将无法使用。为保证大家的网络连接需求，我们将尽快完成配置文件的替换工作，并在完成后第一时间通过官方渠道通知大家下载最新版本。在此期间，我们建议用户手动修改之前配置文件中的服务器地址。详细配置文件及相关支持教程将稍后补充，预计在高一、高二正式开学前完成。</p><p>具体修改要求如下：</p><ul><li>对于VPN配置：请将服务器地址修改为“10.88.202.48”（原地址应为10.88.202.71）。</li><li>对于OpenVPN配置：请将配置文件中的“server”或“host”字段修改为“10.88.202.48”。</li><li>对于HTTP代理：请将代理的IP地址修改为“10.88.202.48”。</li></ul><p>出于安全考虑，我们将VPN密码变更为“@^O^@&#x2F;”，其中“O”为大写字母“O”。用户也可通过学生群一键复制新密码。所有VPN和OpenVPN用户需在正式使用前重新配置密码。</p><p>由此带来的不便，我们深感歉意，敬请理解。</p><p>Yuebi</p><p>2025年8月26日</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;各位校园网在逃人员：&lt;/p&gt;
+&lt;p&gt;原计划通过接入点（AP）进行网络连接遇到了一些技术障碍，暂时无法实施。具体原因将于我们即将发布的下一篇博客中详细说明，我们诚挚邀请您持续关注。&lt;/p&gt;
+&lt;p&gt;我们近期发现校园内有一个已获取密码的WiFi网络，名称为C100。由于信号覆盖范</summary>
+      
+    
+    
+    
+    
+    <category term="通知" scheme="https://yuebittt.github.io/tags/%E9%80%9A%E7%9F%A5/"/>
+    
+  </entry>
   
   <entry>
     <title>写一个高考倒计时！</title>

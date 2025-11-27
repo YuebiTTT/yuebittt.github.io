@@ -6,7 +6,7 @@
   <link href="https://yuebittt.github.io/atom.xml" rel="self"/>
   
   <link href="https://yuebittt.github.io/"/>
-  <updated>2025-08-26T16:49:41.668Z</updated>
+  <updated>2025-11-27T15:59:35.754Z</updated>
   <id>https://yuebittt.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>keylogger2.0</title>
+    <link href="https://yuebittt.github.io/2025/11/25/keylogger2-0/"/>
+    <id>https://yuebittt.github.io/2025/11/25/keylogger2-0/</id>
+    <published>2025-11-24T16:15:14.000Z</published>
+    <updated>2025-11-27T15:59:35.754Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="键盘记录器2-0"><a href="#键盘记录器2-0" class="headerlink" title="键盘记录器2.0"></a>键盘记录器2.0</h1><p><strong>发布日期：2025-11-25</strong></p><p>键盘记录器的功能十分完善，可以十分详细地记录按键及所操作的窗口。但各班台安装键盘记录器后，需要去各班查看记录的内容实在是过于麻烦。于是我制作了<strong>键盘记录器2.0</strong>，可以将日志上传至服务器。</p><h2 id="核心问题分析"><a href="#核心问题分析" class="headerlink" title="核心问题分析"></a>核心问题分析</h2><p>要实现这一功能，有2个核心问题需要解决：<strong>上传</strong>与<strong>接收</strong>。</p><h2 id="接收端设计"><a href="#接收端设计" class="headerlink" title="接收端设计"></a>接收端设计</h2><p>服务器需要有一个能够接收文件的后端，正当我兴冲冲地准备写一个后端时突然想到，<strong>Alist</strong>应该有此类的功能吧？翻阅其文档，我找到了 <strong>Alist API</strong> 的说明，依照 Alist API 的设计，首先需要获取用户的<strong>token</strong>，然后再上传文件。</p><h2 id="日志文件设计"><a href="#日志文件设计" class="headerlink" title="日志文件设计"></a>日志文件设计</h2><p>而上传的文件也需要智能筛选，按照之前程序的设计，所有记录都存储在同一个文件（即<code>log.txt</code>中），但这样这个文件会越来越大，造成不必要的空间浪费，于是我重新设计日志的保存功能。由于不同班每天都会产生新的日志，我决定将日志的格式设计为**<code>ip_YYYYMMDD</code>**，这样可以同时区分是那一台电脑产生的日志，以及产生日志的时间。①</p><p>以此日志的名称命名逻辑，我们以高一二班的电脑为例，将会产生名称为<code>10.88.202.70_251117.log</code>的日志文件。明天运行后将会产生名为<code>10.88.202.70_251118.log</code>的日志。那难道要上传整个日志文件夹，那和直接写在同一个日志文件中并无区别了。所以我在想，既然如此，只要选取<strong>日期最晚的日志</strong>上传即可。如此，每次都只要上传一个文件，只需检查日志文件名中日期最晚的日志就行啦。</p><p>综上，上传日志筛选部分逻辑如下：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在文件夹中挑选文件 → 上传 → 创建新日志</span><br></pre></td></tr></table></figure><h2 id="上传功能实现"><a href="#上传功能实现" class="headerlink" title="上传功能实现"></a>上传功能实现</h2><p>接下来就到了实现最复杂的部分：<strong>上传</strong>。我一开始真的准备用<code>node.js</code>写一个后端，但后来想到 Alist 应该也会有类似的功能吧。在官方文档上一看，果不其然有API。在Alist上传文件，根据我们设置的权限，不登录无法上传文件，所以要上传文件需要登录账号。在Alist API的设计中，可以使用账号与密码获取一个<strong>48小时内有效的token</strong>，上传文件时需要填写token，Alist会根据token判断是否有权限上传文件。</p><p>所以要实现这一功能需要使用2个API：</p><ol><li><strong>token获取</strong>：使用<code>POST</code>请求，路径为 <code>/api/auth/login</code>，要求两个必选参数：<code>username</code> 和 <code>password</code>，返回的<code>data</code>字段将包含 <code>token</code> 字段。</li><li><strong>流式上传文件</strong>：使用<code>PUT</code>请求，路径为 <code>/api/fs/put</code>，需要的参数有 <code>authorization</code>、<code>File-Path</code>、<code>Content-Type</code>、<code>Content-Length</code>。</li></ol><p>C++用起来确实有些难受，效率也比较低。为了发送网络请求，我使用了<code>curl</code>，解析返回值时，我使用了<code>json.hpp</code>。获取token后在返回的字符串中提取获取到的token值，然后将其作为上传的<code>authorization</code>参数，<code>File-Path</code>选择获取到的最晚日期的日志，<code>Content-Length</code>可以使用获取文件的函数获取，这样就可以将指定的日志文件上传上Alist啦。</p><h2 id="完整逻辑流程"><a href="#完整逻辑流程" class="headerlink" title="完整逻辑流程"></a>完整逻辑流程</h2><p>所以至此更改完整逻辑为：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">筛选日志 → 获取Alist用户token → 上传日志 → 创建日志</span><br></pre></td></tr></table></figure><h2 id="功能总结"><a href="#功能总结" class="headerlink" title="功能总结"></a>功能总结</h2><p>大功告成，现在键盘记录器就可以实现<strong>键盘记录+自动上传日志</strong>啦。我们只需要在尽可能多的班级安装键盘记录器，我们只需每日在Alist上查看日志就行了。</p><p>我还准备专门创建一个<strong>供键盘记录器上传文件的Alist用户</strong>，这样在不需要接收日志时只需在Alist上停用此账号即可（我们之前使用的是管理员账户qwq）</p><p>① 此中还产生了一个问题，有时可能会获取到其他网卡的IP地址，如在微软上测试时就获取成了Radom网络中的ip。为了避免这个问题，我在获取IP地址的代码中加入了<strong>优先获取以10.88开头的IP地址</strong>。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;键盘记录器2-0&quot;&gt;&lt;a href=&quot;#键盘记录器2-0&quot; class=&quot;headerlink&quot; title=&quot;键盘记录器2.0&quot;&gt;&lt;/a&gt;键盘记录器2.0&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;发布日期：2025-11-25&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;键盘记录器的</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>网络通知</title>

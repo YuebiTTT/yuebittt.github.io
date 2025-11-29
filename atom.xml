@@ -6,7 +6,7 @@
   <link href="https://yuebittt.github.io/atom.xml" rel="self"/>
   
   <link href="https://yuebittt.github.io/"/>
-  <updated>2025-11-27T15:59:35.754Z</updated>
+  <updated>2025-11-29T14:13:26.877Z</updated>
   <id>https://yuebittt.github.io/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>这不就有ap了嘛</title>
+    <link href="https://yuebittt.github.io/2025/11/29/%E8%BF%99%E4%B8%8D%E5%B0%B1%E6%9C%89ap%E4%BA%86%E5%98%9B/"/>
+    <id>https://yuebittt.github.io/2025/11/29/%E8%BF%99%E4%B8%8D%E5%B0%B1%E6%9C%89ap%E4%BA%86%E5%98%9B/</id>
+    <published>2025-11-29T14:10:56.000Z</published>
+    <updated>2025-11-29T14:13:26.877Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="这不就有AP了嘛"><a href="#这不就有AP了嘛" class="headerlink" title="这不就有AP了嘛"></a>这不就有AP了嘛</h1><h2 id="（在夹缝中生存的）"><a href="#（在夹缝中生存的）" class="headerlink" title="（在夹缝中生存的）"></a>（在夹缝中生存的）</h2><p>在第2篇的第9篇中，主要研究的是<strong>解决电脑与宿舍的通信问题</strong>。众所周知，宿舍都是内置了PC与安全软件的。高三的教学电脑上面有个<strong>AP功能</strong>，可以将安卓系统连接的网络共享出去。</p><p>之前的测试中，Windows端无法与AP ping通，这是为什么呢？原来解决的AP是直接开启了一个新的网段，PC端自然无法连接，但PC是可以直接连<strong>Android主机本身的IP</strong>的。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PC ←→ Android ←→ AP → 手机...</span><br></pre></td></tr></table></figure><p>也就是说我们需要利用<strong>Android作为中间服务器</strong>，物理机就能连接至PC了。Android只需进行<strong>端口转发</strong>即可。在解决上进行端口转发，需要一个能实现端口转发的工具，wjh找到了一个软件<strong>Port forwarding</strong>，可以实现端口转发。</p><p>那么有端口转发有什么用呢？代理？代理固然方便，但代理的限制也确实较多，此前有提及过，在此就不展开了。那比代理更优的方案是<strong>VPN</strong>，这是直接在Android端搭建VPN？等等，不用。连接VPN……好像也可以不用转一个服务器，而是直接通过端口转发VPN使用的通信端口。</p><p>经过测试，我们发现，<strong>没有root权限只能转发&gt;1024的端口</strong>。由于L2TP使用的端口包括用于IPsec的认证与协商的UDP500端口，此端口&lt;1024，所以无法使用L2TP VPN。但是，我们还有一个<strong>OpenVPN</strong>呀。OpenVPN的默认端口号是1194，且可以任意修改端口。也就是说，只要转发1194端口就可以实现连接了。这是将从服务器到PC到Android到AP，即：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">VPN服务器 ←→ PC ←→ Android ←→ AP</span><br><span class="line">0.88.202.73:1194    10.88.202.33:1194    4:1194    192.168.54.1:1194</span><br></pre></td></tr></table></figure><p>经过多圈的转发，手机就可通过AP顺利地连接至服务器。PC端需要配置的就只有<strong>gost</strong>了。使用gost进行端口转发：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gost -L=rudp://:1194/10.88.202.73:1194</span><br></pre></td></tr></table></figure><p>然而在我们的测试时却出现了问题，VPN无法连接，打开gost的输出窗口，发现确实有出现数据包传输。为了进一步排查错误，我们想到还可以转发<strong>Alist的5244端口</strong>，毕竟网页传输的数据包内容得多。在手机上连上AP，访问192.168.54.1:5244，Alist的页面出现，但一直在转圈加载（这是Alist本身的加载动画），说明Alist的网页有被传输过来，但是因为未知原因卡住了。</p><p>我们打开<strong>Wireshark</strong>进行抓包观测。从抓包结果中我们可以看出只有几个数据包的传输，对比正常的Alist访问的数据包，在手机上只发出了几个请求。于是我们便可以猜测，是传输的过程出现了问题。</p><p>经过wjh的排查，我们发现，问题出现在安卓上负责转发的软件<strong>Port forwarder</strong>上。这个软件太老了，居然只会转发一条连接的几个数据包。我们找到一个性能更好的且UI界面极其美观的软件，<strong>Fwd port forwarding</strong>。这个软件体积更小，我们用这个软件替换了旧软件，于是，连接终于一切正常。</p><p>综上，总结一下解决的配置方法：</p><ol><li>打开解决的<strong>USB调试</strong></li><li>将包含Fwd软件的<strong>Fit32格式的U盘</strong>接到解决上，安装此软件</li><li>在设置中开启<strong>AP</strong></li><li>在fwd的设置中设置<strong>端口转发</strong>，其中ip填写PC端的ip，即可转到PC端</li><li>安装<strong>gost</strong>，推荐通过bat脚本使用gost进行端口转发</li><li>可以使用计划任务将此脚本加入自动启动</li><li>手机端使用<strong>openvpn</strong>连接</li></ol><p>需要注意的是，需要修改配置文件：</p><ul><li>解决电网ip统一为<strong>192.168.41.1</strong></li><li>将原openvpn配置文件中的ip <strong>10.88.202.73</strong>改为<strong>192.168.54.1</strong>即可</li><li>经过测试，使用UDP连接VPN会出现问题，使用<strong>TCP</strong>进行连接更为稳定，所以在配置文件中指定VPN的连接方式为TCP</li></ul><p>高三的教学楼就像一堵坚实的墙，密不透风。直到现在，我们终于打开了一扇窗。</p><hr><h2 id="配置步骤简化清单"><a href="#配置步骤简化清单" class="headerlink" title="配置步骤简化清单"></a>配置步骤简化清单</h2><h3 id="一、PC端准备"><a href="#一、PC端准备" class="headerlink" title="一、PC端准备"></a>一、PC端准备</h3><ol><li>安装<code>gost</code>工具</li><li>执行端口转发命令：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gost -L=rudp://:1194/10.88.202.73:1194</span><br></pre></td></tr></table></figure></li><li>（可选）通过计划任务将上述命令加入自动启动</li></ol><h3 id="二、Android端配置"><a href="#二、Android端配置" class="headerlink" title="二、Android端配置"></a>二、Android端配置</h3><ol><li>开启USB调试，通过U盘安装<code>Fwd port forwarding</code>软件</li><li>打开系统设置→开启AP功能</li><li>在<code>Fwd</code>中设置端口转发：<ul><li>转发端口：<code>1194</code></li><li>目标IP：PC端的IP</li><li>目标端口：<code>1194</code></li></ul></li></ol><h3 id="三、手机端连接"><a href="#三、手机端连接" class="headerlink" title="三、手机端连接"></a>三、手机端连接</h3><ol><li>连接AP网络</li><li>修改<code>openvpn</code>配置文件：<ul><li>将原IP<code>10.88.202.73</code>改为<code>192.168.54.1</code></li><li>指定连接方式为<code>TCP</code></li></ul></li><li>启动<code>openvpn</code>连接</li></ol>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;这不就有AP了嘛&quot;&gt;&lt;a href=&quot;#这不就有AP了嘛&quot; class=&quot;headerlink&quot; title=&quot;这不就有AP了嘛&quot;&gt;&lt;/a&gt;这不就有AP了嘛&lt;/h1&gt;&lt;h2 id=&quot;（在夹缝中生存的）&quot;&gt;&lt;a href=&quot;#（在夹缝中生存的）&quot; class=&quot;he</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>keylogger2.0</title>

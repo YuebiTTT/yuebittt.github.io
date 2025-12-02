@@ -1,66 +1,71 @@
-#page-header,
-#page-header:before {
-  background: transparent !important;
+/* 全局字体大小调整 */
+body {
+  font-size: 16px;
 }
-#page-header.post-bg,
-#page-header.not-home-page {
-  height: 280px !important;
+
+/* 文章内容字体大小 */
+.post-content {
+  font-size: 16px;
+  line-height: 1.8;
 }
-#page-header #post-info {
-  bottom: 40px !important;
+
+/* 标题字体大小 */
+h1 {
+  font-size: 2rem;
 }
-#page-header #page-site-info {
-  top: 140px !important;
+
+h2 {
+  font-size: 1.8rem;
 }
-@media screen and (max-width: 768px) {
-  #page-header.not-home-page {
-    height: 200px !important;
-  }
-  #page-header #post-info {
-    bottom: 10px !important;
-  }
-  #page-header #page-site-info {
-    top: 100px !important;
-  }
+
+h3 {
+  font-size: 1.6rem;
 }
-.top-img {
-  height: 250px;
-  margin: -50px -40px 50px;
-  border-top-left-radius: inherit;
-  border-top-right-radius: inherit;
-  background-position: center center;
-  background-size: cover;
-  -webkit-transition: all 0.3s;
-  -moz-transition: all 0.3s;
-  -o-transition: all 0.3s;
-  -ms-transition: all 0.3s;
-  transition: all 0.3s;
+
+h4 {
+  font-size: 1.4rem;
 }
-@media screen and (max-width: 768px) {
-  .top-img {
-    height: 230px;
-    margin: -36px -14px 36px;
-  }
+
+h5 {
+  font-size: 1.2rem;
 }
-[data-theme='dark'] .top-img {
-  filter: brightness(0.8);
+
+h6 {
+  font-size: 1rem;
 }
-#footer:before {
-  background-color: rgba(255,255,255,0.5);
+
+/* 侧边栏字体大小 */
+.aside-content {
+  font-size: 14px;
 }
-[data-theme='dark'] #footer:before {
-  background-color: rgba(0,0,0,0.5);
+
+/* 导航栏字体大小 */
+.nav-item {
+  font-size: 15px;
 }
-#footer-wrap,
-#footer-wrap a {
-  color: #111;
-  -webkit-transition: unset;
-  -moz-transition: unset;
-  -o-transition: unset;
-  -ms-transition: unset;
-  transition: unset;
+
+/* 底部字体大小 */
+.footer {
+  font-size: 14px;
 }
-[data-theme='dark'] #footer-wrap,
-[data-theme='dark'] #footer-wrap a {
-  color: var(--light-grey);
+
+/* 代码块字体大小 */
+pre, code {
+  font-size: 14px;
+}
+
+/* 标签和分类字体大小 */
+.tag, .category {
+  font-size: 13px;
+}
+
+/* 文章元信息字体大小 */
+.post-meta {
+  font-size: 14px;
+}
+
+/* 首页文章摘要字体大小 */
+.excerpt {
+  font-size: 15px;
+  line-height: 1.7;
 }
